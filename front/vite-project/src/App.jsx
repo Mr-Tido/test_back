@@ -26,7 +26,7 @@ useEffect(() => {
 }, [])
 
 
-const onDelete = async (itemId) => {
+    const onDelete = async (itemId) => {
         try {
             await axios.delete(`http://localhost:3000/api/delete/${itemId}`);
             setData(prev => prev.filter(item => item.id !== Number(itemId)));
@@ -140,6 +140,13 @@ const handleSubmit = async (e) => {
                 
             ))}
         </div>
+
+
+        <form onSubmit={handleSubmit}>
+            <input value={username} onChange={e => setUsername(e.target.value)} placeholder="Логин" />
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Пароль" />
+            <button type="submit">Регистрация</button>
+        </form>
     </>
   )
 }
