@@ -16,7 +16,8 @@ export default function App() {
   const [password, setPassword] = useState('');
   const [userAge, setUserAge] = useState('')
   const [isError, setIsError] = useState(false);
-
+  const [loginUsername, setLoginUsername] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
 
 
 useEffect(() => {
@@ -24,6 +25,59 @@ useEffect(() => {
   .then(res => res.json())
   .then(data => setData(data))
 }, [])
+
+    useEffect(() => {
+        axios.interceptors.request.use((config) => {
+            const currentToken = localStorage.getItem('token');
+            if (currentToken) {
+                config.headers.Authorization = `Bearer ${currentToken}`;
+            }
+            return config;
+        });
+    }, []);
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setMessage('');
+        setLoading(true);
+
+        try {
+            const response = await axios.post('/api/auth/login', {
+                name_user: loginUsername,
+                password: loginPassword,
+            });
+
+            const newToken = response.data.token;
+            setToken(newToken);
+            setUser(response.data.user);
+            localStorage.setItem('token', newToken);
+
+            setMessage('✅ Вход успешен!');
+            loadData(); // Загрузить продукты после логина
+
+            setLoginUsername('');
+            setLoginPassword('');
+        } catch (error) {
+            setMessage(error.response?.data?.error || 'Ошибка входа');
+            setIsError(true);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleLogout = () => {
+        setUser(null);
+        setToken(null);
+        setData([]);
+        localStorage.removeItem('token');
+        delete axios.defaults.headers.common['Authorization'];
+        setMessage('Выход выполнен');
+    };
+
+
+
+
+
 
 
     const onDelete = async (itemId) => {
@@ -141,13 +195,31 @@ const handleSubmit = async (e) => {
             ))}
         </div>
 
+        <div className="auth-container">
+            <h2>🚀 Авторизация</h2>
+            <div className="form-container">
+                <h3>Вход</h3>
+                <form onSubmit={handleLogin}>
+                    <input
+                        type="text"
+                        placeholder="Логин"
+                        value={loginUsername}
+                        onChange={(e) => setLoginUsername(e.target.value)}
+                        required
+                    />
+                    <input
+                        type="password"
+                        placeholder="Пароль"
+                        value={loginPassword}
+                        onChange={(e) => setLoginPassword(e.target.value)}
+                        required
+                    />
+                    <button type="submit" disabled={loading}>Войти</button>
+                </form>
+            </div>
+        </div>
 
-        <form onSubmit={handleSubmit}>
-            <input value={username} onChange={e => setUsername(e.target.value)} placeholder="Логин" />
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Пароль" />
-            <button type="submit">Регистрация</button>
-        </form>
-    </>
+        </>
   )
 }
 
