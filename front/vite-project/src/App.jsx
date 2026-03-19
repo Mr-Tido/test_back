@@ -1,7 +1,6 @@
 import { useState,useEffect } from 'react'
 import axios from 'axios'
 import './App.css'
-import { Link } from 'react-router-dom';
  
 export default function App() {
   const [user, setUser] = useState(null);
@@ -19,13 +18,6 @@ export default function App() {
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
 
-
-useEffect(() => {
-  fetch('http://localhost:3000/api/main')
-  .then(res => res.json())
-  .then(data => setData(data))
-}, [])
-
     useEffect(() => {
         axios.interceptors.request.use((config) => {
             const currentToken = localStorage.getItem('token');
@@ -36,24 +28,24 @@ useEffect(() => {
         });
     }, []);
 
-    const handleLogin = async (e) => {
+     const handleLogin = async (e) => {
         e.preventDefault();
         setMessage('');
         setLoading(true);
-
+      
         try {
-            const response = await axios.post('/api/auth/login', {
+            const response = await axios.post('http://localhost:3000/api/auth/login', {
                 name_user: loginUsername,
                 password: loginPassword,
             });
-
+            
             const newToken = response.data.token;
             setToken(newToken);
             setUser(response.data.user);
             localStorage.setItem('token', newToken);
 
             setMessage('✅ Вход успешен!');
-            loadData(); // Загрузить продукты после логина
+            loadData(); 
 
             setLoginUsername('');
             setLoginPassword('');
@@ -64,8 +56,9 @@ useEffect(() => {
             setLoading(false);
         }
     };
+    console.log(handleLogin.response)
 
-    const handleLogout = () => {
+     const handleLogout = () => {
         setUser(null);
         setToken(null);
         setData([]);
@@ -73,11 +66,12 @@ useEffect(() => {
         delete axios.defaults.headers.common['Authorization'];
         setMessage('Выход выполнен');
     };
-
-
-
-
-
+    
+useEffect(() => {
+  fetch('http://localhost:3000/api/main')
+  .then(res => res.json())
+  .then(data => setData(data))
+}, [])
 
 
     const onDelete = async (itemId) => {
@@ -124,6 +118,7 @@ const handleSubmit = async (e) => {
     } finally {
       setLoading(false);
     }
+    
   };
 
 
@@ -154,7 +149,7 @@ const handleSubmit = async (e) => {
             onChange={(e)=> setUserAge(e.target.value)}
             required
           />
-          <button type="submit">Зарегистрироваться</button>
+          <button type="submit" >Зарегистрироваться</button>
         </form>
         {message && (
           <div className={isError ? 'error' : 'success'}>
@@ -195,8 +190,8 @@ const handleSubmit = async (e) => {
             ))}
         </div>
 
+
         <div className="auth-container">
-            <h2>🚀 Авторизация</h2>
             <div className="form-container">
                 <h3>Вход</h3>
                 <form onSubmit={handleLogin}>
@@ -214,12 +209,11 @@ const handleSubmit = async (e) => {
                         onChange={(e) => setLoginPassword(e.target.value)}
                         required
                     />
-                    <button type="submit" disabled={loading}>Войти</button>
+                    <button type="submit" onClick={handleLogin} >Войти</button>
                 </form>
             </div>
         </div>
-
-        </>
+    </>
   )
 }
 
