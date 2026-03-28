@@ -134,7 +134,7 @@ app.post('/api/auth/login', async (req, res) => {
     }
 })
 
-// ✅ Личный кабинет защищён!
+
 app.get('/api/profile', authenticateToken, async (req, res) => {
     try {
         const result = await pool.query(
