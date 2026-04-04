@@ -4,7 +4,7 @@ const cors = require('cors')
 const bcrypt = require('bcryptjs')
 const { Pool } = require('pg')
 const jwt = require('jsonwebtoken')
-
+//privet
 const app = express()
 
 app.use(cors({
